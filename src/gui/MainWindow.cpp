@@ -36,8 +36,9 @@ void MainWindow::loadWad()
 	QString wadPath = QFileDialog::getOpenFileName(
 		nullptr,
 		("Select WAD"),
-		QDir::currentPath());
-
+		QDir::currentPath(),
+		"WAD (*.WAD *.wad)");
+	
 	ui->wadPathLineEdit->setText(wadPath);
 	loadedWad = wad_open(wadPath.toUtf8());
 	refresh();
