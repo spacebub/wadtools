@@ -59,7 +59,7 @@ enter the WadTools repository root where you cloned the project
 For 32bit builds you can set the CMake platform to Win32 with -A Win32.
 The 32bit triplet is x86-windows-static.
 
-1.3 Compilation on Windows
+1.3 Compilation on Linux
 -----------------------
 CMake by default will generate the necessary makefile:
 
