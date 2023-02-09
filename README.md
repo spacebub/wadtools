@@ -22,7 +22,7 @@ Create a build directory in the repository root, enter it then configure with CM
 
 To know which version to pass to -G you can consult:
 
-	<https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html#visual-studio-generators>
+<https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html#visual-studio-generators>
 
 After the build is complete and you have a WadTools.exe file, assuming you have
 the correct Qt directory registered in your PATH:
