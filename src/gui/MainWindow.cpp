@@ -39,7 +39,18 @@ void MainWindow::loadWad()
 		QDir::currentPath(),
 		"WAD (*.WAD *.wad)");
 	
+	if (wadPath.isEmpty())
+	{
+		return;
+	}
+	
 	ui->wadPathLineEdit->setText(wadPath);
+
+	if (loadedWad)
+	{
+		wad_free(loadedWad);
+	}
+	
 	loadedWad = wad_open(wadPath.toUtf8());
 	refresh();
 }
