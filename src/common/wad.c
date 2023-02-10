@@ -233,6 +233,7 @@ wad_lump_names_path(const char* path)
 
 	if (!fp)
 	{
+		list_free(strlist);
 		return NULL;
 	}
 
@@ -304,7 +305,7 @@ get_metadata(wad_t** wads, int length)
 	if (!(metadata->lumpdata = malloc(sizeof(lumpbundle_t) * metadata->numlumps)))
 	{
 		return NULL;
-	};
+	}
 
 	int bufflength;
 	for (int iwad = 0, ilump = 0; iwad < length; ++iwad)
