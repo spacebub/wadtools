@@ -12,15 +12,16 @@
 #define _LIST_H_
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
-	
+
 // Base type used by the list implementation.
 // Should ideally not be manually created or
 // disposed of, instead use list_new for creation
 // and list_free for deletion.
-typedef struct{
-	char** values;
+typedef struct
+{
+	void** values;
 	int length;
 	int capacity;
 } list_t;
@@ -28,17 +29,20 @@ typedef struct{
 // Returns a pointer to a basic dynamic list
 // of size "capacity", initialized with length 0
 // and a void** with dimension "capacity".
-list_t* list_new(int capacity);
+list_t*
+list_new(int capacity);
 // Adds a new element to given list. If the
 // new length exceeds or equals the list
 // capacity, doubles the previous capacity,
 // moves old elements to the new memory
 // and frees the old allocation.
-void list_add(list_t* list, void* value, int length);
+void
+list_add(list_t* list, void* value, size_t size);
 // Frees the resources allocated by the list
 // including all values copied to it during
 // insertion.
-void list_free(list_t* list);
+void
+list_free(list_t* list);
 
 #ifdef __cplusplus
 }

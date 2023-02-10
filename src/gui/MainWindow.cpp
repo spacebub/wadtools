@@ -38,19 +38,20 @@ void MainWindow::loadWad()
 		("Select WAD"),
 		QDir::currentPath(),
 		"WAD (*.WAD *.wad)");
-	
+
 	if (wadPath.isEmpty())
 	{
 		return;
 	}
-	
+
 	ui->wadPathLineEdit->setText(wadPath);
 
 	if (loadedWad)
 	{
 		wad_free(loadedWad);
+		loadedWad = nullptr;
 	}
-	
+
 	loadedWad = wad_open(wadPath.toUtf8());
 	refresh();
 }
@@ -64,17 +65,17 @@ void MainWindow::refresh()
 
 	ui->lumpNamesList->clear();
 	ui->mapNamesList->clear();
-	
+
 	list_t* mapNames = wad_map_names(loadedWad);
 	for (int i = 0; i < mapNames->length; ++i)
 	{
-		ui->mapNamesList->addItem(mapNames->values[i]);
+		ui->mapNamesList->addItem((char*)mapNames->values[i]);
 	}
 
 	list_t* lumpNames = wad_lump_names(loadedWad);
 	for (int i = 0; i < lumpNames->length; ++i)
 	{
-		ui->lumpNamesList->addItem(lumpNames->values[i]);
+		ui->lumpNamesList->addItem((char*)lumpNames->values[i]);
 	}
 
 	list_free(mapNames);

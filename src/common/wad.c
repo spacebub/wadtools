@@ -18,9 +18,10 @@
 // The max length of a lump name according to specification
 #define LUMP_NAME_LENGTH 8
 
-typedef struct{
+typedef struct
+{
 	size_t lumpdatalength;
-	lumpbundle_t * lumpdata;
+	lumpbundle_t* lumpdata;
 	int numlumps;
 } combination_metadata_t;
 
@@ -30,7 +31,8 @@ static void set_header(wad_t* receiving, combination_metadata_t* metadata, const
 static void set_data(wad_t* receiving, combination_metadata_t* metadata);
 static void set_lumps(wad_t* receiving, combination_metadata_t* metadata);
 
-wad_t* wad_open(const char* path)
+wad_t*
+wad_open(const char* path)
 {
 	FILE* fp = fopen(path, "r");
 
@@ -76,8 +78,14 @@ wad_t* wad_open(const char* path)
 	return wad;
 }
 
-void wad_free(wad_t* wad)
+void
+wad_free(wad_t* wad)
 {
+	if (!wad)
+	{
+		return;
+	}
+	
 	for (int i = 0; i < wad->header.numlumps; ++i)
 	{
 		free(wad->lumpbundles[i].buffer);
@@ -87,8 +95,14 @@ void wad_free(wad_t* wad)
 	free(wad);
 }
 
-int wad_write(wad_t* wad, const char* path)
+int
+wad_write(wad_t* wad, const char* path)
 {
+	if (!wad)
+	{
+		return 1;
+	}
+	
 	FILE* fp = fopen(path, "w");
 
 	if (!fp)
@@ -119,7 +133,8 @@ int wad_write(wad_t* wad, const char* path)
 	return 0;
 }
 
-list_t* wad_map_names(wad_t* wad)
+list_t*
+wad_map_names(wad_t* wad)
 {
 	if (!wad)
 	{
@@ -127,7 +142,7 @@ list_t* wad_map_names(wad_t* wad)
 	}
 
 	list_t* strlist = list_new(2);
-	
+
 	// Generally the WAD structure follows a simple layout,
 	// and we can assume that it will hold for most WADs.
 	// In most cases map lumps follow the pattern:
@@ -149,7 +164,8 @@ list_t* wad_map_names(wad_t* wad)
 	return strlist;
 }
 
-list_t* wad_map_names_path(const char* path)
+list_t*
+wad_map_names_path(const char* path)
 {
 	list_t* strlist = list_new(2);
 
@@ -159,7 +175,7 @@ list_t* wad_map_names_path(const char* path)
 	{
 		return NULL;
 	}
-	
+
 	wadheader_t header;
 	fread(&header, sizeof(wadheader_t), 1, fp);
 
@@ -190,7 +206,8 @@ list_t* wad_map_names_path(const char* path)
 	return strlist;
 }
 
-list_t* wad_lump_names(wad_t* wad)
+list_t*
+wad_lump_names(wad_t* wad)
 {
 	if (!wad)
 	{
@@ -198,7 +215,7 @@ list_t* wad_lump_names(wad_t* wad)
 	}
 
 	list_t* strlist = list_new(2);
-	
+
 	for (int i = 0; i < wad->header.numlumps; ++i)
 	{
 		list_add(strlist, wad->lumpbundles[i].lump.name, LUMP_NAME_LENGTH);
@@ -207,7 +224,8 @@ list_t* wad_lump_names(wad_t* wad)
 	return strlist;
 }
 
-list_t* wad_lump_names_path(const char* path)
+list_t*
+wad_lump_names_path(const char* path)
 {
 	list_t* strlist = list_new(2);
 
@@ -224,7 +242,7 @@ list_t* wad_lump_names_path(const char* path)
 	wadlump_t* lumps = malloc(header.numlumps * sizeof(wadlump_t));
 	fseek(fp, header.lumpoffset, 0);
 	fread(lumps, sizeof(wadlump_t), header.numlumps, fp);
-	
+
 	for (int i = 0; i < header.numlumps; ++i)
 	{
 		list_add(strlist, lumps[i].name, LUMP_NAME_LENGTH);
@@ -235,16 +253,27 @@ list_t* wad_lump_names_path(const char* path)
 	return strlist;
 }
 
-wad_t* wad_combine(const char** paths, int length)
+wad_t*
+wad_combine(const char** paths, int length)
 {
 	wad_t* combinedwad = malloc(sizeof(wad_t));
 	wad_t** wad_list = malloc(sizeof(wad_t*) * length);
-
+	
 	for (int i = 0; i < length; ++i)
 	{
-		wad_list[i] = wad_open(paths[i]);
+		if (!(wad_list[i] = wad_open(paths[i])))
+		{
+			for (int j = 0; j < i; ++j)
+			{
+				wad_free(wad_list[j]);
+			}
+			free(wad_list);
+			free(combinedwad);
+			
+			return NULL;
+		}
 	}
-	
+
 	combination_metadata_t* metadata = get_metadata(wad_list, length);
 	set_header(combinedwad, metadata, "IWAD");
 	set_lumps(combinedwad, metadata);
@@ -256,22 +285,26 @@ wad_t* wad_combine(const char** paths, int length)
 		wad_free(wad_list[i]);
 	}
 	free(wad_list);
-	
+
 	return combinedwad;
 }
 
-static combination_metadata_t* get_metadata(wad_t** wads, int length)
+static combination_metadata_t*
+get_metadata(wad_t** wads, int length)
 {
 	combination_metadata_t* metadata = malloc(sizeof(combination_metadata_t));
 	metadata->lumpdatalength = 0;
 	metadata->numlumps = 0;
-	
+
 	for (int i = 0; i < length; ++i)
 	{
 		metadata->numlumps += wads[i]->header.numlumps;
 	}
 
-	metadata->lumpdata = malloc(sizeof(lumpbundle_t) * metadata->numlumps);
+	if (!(metadata->lumpdata = malloc(sizeof(lumpbundle_t) * metadata->numlumps)))
+	{
+		return NULL;
+	};
 
 	int bufflength;
 	for (int iwad = 0, ilump = 0; iwad < length; ++iwad)
@@ -279,32 +312,34 @@ static combination_metadata_t* get_metadata(wad_t** wads, int length)
 		for (int j = 0; j < wads[iwad]->header.numlumps; ++j)
 		{
 			bufflength = wads[iwad]->lumpbundles[j].lump.length;
-			
+
 			metadata->lumpdata[ilump].lump.length = bufflength;
 			metadata->lumpdata[ilump].lump = wads[iwad]->lumpbundles[j].lump;
-			
+
 			metadata->lumpdata[ilump].buffer = malloc(sizeof(char) * bufflength);
-			memcpy(metadata->lumpdata[ilump].buffer,  wads[iwad]->lumpbundles[j].buffer, bufflength);
-			
+			memcpy(metadata->lumpdata[ilump].buffer, wads[iwad]->lumpbundles[j].buffer, bufflength);
+
 			metadata->lumpdatalength += bufflength;
 			ilump++;
 		}
 	}
-	
+
 	return metadata;
 }
 
-static void set_header(wad_t* receiving, combination_metadata_t* metadata, const char wadtype[4])
+static void
+set_header(wad_t* receiving, combination_metadata_t* metadata, const char wadtype[4])
 {
 	wadheader_t header;
 	header.lumpoffset = (int)(metadata->lumpdatalength * sizeof(char) + sizeof(wadheader_t));
 	header.numlumps = metadata->numlumps;
 	memcpy(header.type, wadtype, 4);
-	
+
 	receiving->header = header;
 }
 
-static void set_data(wad_t* receiving, combination_metadata_t* metadata)
+static void
+set_data(wad_t* receiving, combination_metadata_t* metadata)
 {
 	int currentoffset = sizeof(wadheader_t);
 
@@ -316,19 +351,21 @@ static void set_data(wad_t* receiving, combination_metadata_t* metadata)
 	}
 }
 
-static void set_lumps(wad_t* receiving, combination_metadata_t* metadata)
+static void
+set_lumps(wad_t* receiving, combination_metadata_t* metadata)
 {
 	lumpbundle_t* lumpbundles = malloc(sizeof(lumpbundle_t) * metadata->numlumps);
-	
+
 	for (int i = 0; i < metadata->numlumps; ++i)
 	{
 		lumpbundles[i].lump = metadata->lumpdata[i].lump;
 	}
-	
+
 	receiving->lumpbundles = lumpbundles;
 }
 
-static void free_metadata(combination_metadata_t* metadata)
+static void
+free_metadata(combination_metadata_t* metadata)
 {
 	free(metadata->lumpdata);
 	free(metadata);

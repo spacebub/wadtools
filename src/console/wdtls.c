@@ -19,7 +19,7 @@ static void list_lump_names(list_t* paths);
 
 int main(int argc, char** argv)
 {
-	if (argc == 0)
+	if (argc == 1)
 	{
 		printf("At least one argument must be provided!\n");
 		return 1;

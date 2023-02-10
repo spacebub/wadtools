@@ -15,7 +15,8 @@
 // The factor by which the list grows when at capacity
 #define GROWTH_FACTOR 2
 
-list_t* list_new(int capacity)
+list_t*
+list_new(int capacity)
 {
 	if (capacity <= 1)
 	{
@@ -23,8 +24,13 @@ list_t* list_new(int capacity)
 	}
 
 	list_t* list = malloc(sizeof(list_t));
-	char** values = malloc(sizeof(void*) * capacity);
+	void** values = malloc(sizeof(void*) * capacity);
 
+	if (!list || !values)
+	{
+		return NULL;
+	}
+	
 	list->length = 0;
 	list->capacity = capacity;
 	list->values = values;
@@ -32,27 +38,40 @@ list_t* list_new(int capacity)
 	return list;
 }
 
-void list_add(list_t* list, void* value, int length)
+void
+list_add(list_t* list, void* value, size_t size)
 {
+	if (!list)
+	{
+		return;
+	}
+	
 	if (list->capacity <= list->length + 1)
 	{
 		list->capacity *= GROWTH_FACTOR;
-		list->values = realloc(list->values, sizeof(void*) * list->capacity);
+		list->values = realloc(list->values, size * list->capacity);
 	}
 
-	list->values[list->length] = calloc(1, sizeof(void) * length + 1);
-	memcpy(list->values[list->length], value, length);
-	
-	list->length++;
+	if ((list->values[list->length] = calloc(1, size + 1)))
+	{
+		memcpy(list->values[list->length], value, size);
+		list->length++;
+	}
 }
 
-void list_free(list_t* list)
+void
+list_free(list_t* list)
 {
+	if (!list)
+	{
+		return;
+	}
+	
 	for (int i = 0; i < list->length; ++i)
 	{
 		free(list->values[i]);
 	}
-	
+
 	free(list->values);
 	free(list);
 }
