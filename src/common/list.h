@@ -8,8 +8,8 @@
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */
-#ifndef _LIST_H_
-#define _LIST_H_
+#ifndef WDTLS_LIST_H_
+#define WDTLS_LIST_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,11 +31,8 @@ typedef struct
 // and a void** with dimension "capacity".
 list_t*
 list_new(int capacity);
-// Adds a new element to given list. If the
-// new length exceeds or equals the list
-// capacity, doubles the previous capacity,
-// moves old elements to the new memory
-// and frees the old allocation.
+// Takes a pointer to a given element of size_t size
+// and copies the contents into the given list.
 void
 list_add(list_t* list, void* value, size_t size);
 // Frees the resources allocated by the list
@@ -48,4 +45,4 @@ list_free(list_t* list);
 }
 #endif
 
-#endif //_LIST_H_
+#endif //WDTLS_LIST_H_

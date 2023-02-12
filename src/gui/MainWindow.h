@@ -6,8 +6,8 @@
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */
-#ifndef _MAINWINDOW_H_
-#define _MAINWINDOW_H_
+#ifndef WDTLS_MAINWINDOW_H_
+#define WDTLS_MAINWINDOW_H_
 
 #include <QWidget>
 #include "common/wad.h"
@@ -36,4 +36,4 @@ class MainWindow : public QWidget
 	void loadWad();
 };
 
-#endif //_MAINWINDOW_H_
+#endif //WDTLS_MAINWINDOW_H_

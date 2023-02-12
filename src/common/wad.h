@@ -8,8 +8,8 @@
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */
-#ifndef _WAD_H_
-#define _WAD_H_
+#ifndef WDTLS_WAD_H_
+#define WDTLS_WAD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,4 +90,4 @@ wad_combine(const char** paths, int length);
 }
 #endif
 
-#endif //_WAD_H_
+#endif //WDTLS_WAD_H_
