@@ -17,6 +17,8 @@
 #define MAP_IDENTIFIER "THINGS"
 // The max length of a lump name according to specification
 #define LUMP_NAME_LENGTH 8
+// Default capacity for dynamic lists
+#define DEFAULT_LIST_SIZE 32
 
 typedef struct
 {
@@ -141,7 +143,7 @@ wad_map_names(wad_t* wad)
 		return NULL;
 	}
 
-	list_t* strlist = list_new(2);
+	list_t* strlist = list_new(DEFAULT_LIST_SIZE);
 
 	// Generally the WAD structure follows a simple layout,
 	// and we can assume that it will hold for most WADs.
@@ -167,18 +169,18 @@ wad_map_names(wad_t* wad)
 list_t*
 wad_map_names_path(const char* path)
 {
-	list_t* strlist = list_new(2);
-
 	FILE* fp = fopen(path, "r");
 
 	if (!fp)
 	{
 		return NULL;
 	}
+	
+	list_t* strlist = list_new(DEFAULT_LIST_SIZE);
 
 	wadheader_t header;
 	fread(&header, sizeof(wadheader_t), 1, fp);
-
+	
 	wadlump_t* lumps = malloc(header.numlumps * sizeof(wadlump_t));
 	fseek(fp, header.lumpoffset, 0);
 	fread(lumps, sizeof(wadlump_t), header.numlumps, fp);
@@ -214,7 +216,7 @@ wad_lump_names(wad_t* wad)
 		return NULL;
 	}
 
-	list_t* strlist = list_new(2);
+	list_t* strlist = list_new(wad->header.numlumps + 1);
 
 	for (int i = 0; i < wad->header.numlumps; ++i)
 	{
@@ -227,19 +229,18 @@ wad_lump_names(wad_t* wad)
 list_t*
 wad_lump_names_path(const char* path)
 {
-	list_t* strlist = list_new(2);
-
 	FILE* fp = fopen(path, "r");
 
 	if (!fp)
 	{
-		list_free(strlist);
 		return NULL;
 	}
 
 	wadheader_t header;
 	fread(&header, sizeof(wadheader_t), 1, fp);
 
+	list_t* strlist = list_new(header.numlumps + 1);
+	
 	wadlump_t* lumps = malloc(header.numlumps * sizeof(wadlump_t));
 	fseek(fp, header.lumpoffset, 0);
 	fread(lumps, sizeof(wadlump_t), header.numlumps, fp);
