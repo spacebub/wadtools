@@ -4,7 +4,7 @@
  * 
  * Very simple mechanism for dynamic array management for use in this project
  *
- * Copyright (c) 2023 spacebub
+ * Copyright (c) 2023
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */
@@ -26,11 +26,6 @@ list_new(int capacity)
 	list_t* list = malloc(sizeof(list_t));
 	void** values = malloc(sizeof(void*) * capacity);
 
-	if (!list || !values)
-	{
-		return NULL;
-	}
-	
 	list->length = 0;
 	list->capacity = capacity;
 	list->values = values;

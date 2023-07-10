@@ -4,7 +4,7 @@
  * 
  * Entry point for the gui application
  *
- * Copyright (c) 2023 spacebub
+ * Copyright (c) 2023
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */

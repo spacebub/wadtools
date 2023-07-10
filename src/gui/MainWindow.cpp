@@ -2,7 +2,7 @@
 /*
  * Part of wadtools
  * 
- * Copyright (c) 2023 spacebub
+ * Copyright (c) 2023
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */
@@ -78,6 +78,5 @@ void MainWindow::refresh()
 		ui->lumpNamesList->addItem((char*)lumpNames->values[i]);
 	}
 
-	list_free(mapNames);
 	list_free(lumpNames);
 }

@@ -4,7 +4,7 @@
  * 
  * Provides basic reading and writing of WAD files
  *
- * Copyright (c) 2023 spacebub
+ * Copyright (c) 2023
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */
@@ -17,6 +17,8 @@
 #define MAP_IDENTIFIER "THINGS"
 // The max length of a lump name according to specification
 #define LUMP_NAME_LENGTH 8
+// The max length of a header type according to specification
+#define HEADER_TYPE_LENGTH 4
 // Default capacity for dynamic lists
 #define DEFAULT_LIST_SIZE 32
 
@@ -29,8 +31,7 @@ typedef struct
 
 static combination_metadata_t* get_metadata(wad_t** wads, int length);
 static void free_metadata(combination_metadata_t* metadata);
-static void set_header(wad_t* receiving, combination_metadata_t* metadata, const char wadtype[4]);
-static void set_data(wad_t* receiving, combination_metadata_t* metadata);
+static void set_header(wad_t* receiving, combination_metadata_t* metadata, const char wadtype[HEADER_TYPE_LENGTH]);
 static void set_lumps(wad_t* receiving, combination_metadata_t* metadata);
 
 wad_t*
@@ -279,7 +280,6 @@ wad_combine(const char** paths, int length)
 	combination_metadata_t* metadata = get_metadata(wad_list, length);
 	set_header(combinedwad, metadata, "IWAD");
 	set_lumps(combinedwad, metadata);
-	set_data(combinedwad, metadata);
 	free_metadata(metadata);
 
 	for (int i = 0; i < length; ++i)
@@ -330,37 +330,28 @@ get_metadata(wad_t** wads, int length)
 }
 
 static void
-set_header(wad_t* receiving, combination_metadata_t* metadata, const char wadtype[4])
+set_header(wad_t* receiving, combination_metadata_t* metadata, const char wadtype[HEADER_TYPE_LENGTH])
 {
 	wadheader_t header;
 	header.lumpoffset = (int)(metadata->lumpdatalength * sizeof(char) + sizeof(wadheader_t));
 	header.numlumps = metadata->numlumps;
-	memcpy(header.type, wadtype, 4);
+	memcpy(header.type, wadtype, HEADER_TYPE_LENGTH);
 
 	receiving->header = header;
 }
 
 static void
-set_data(wad_t* receiving, combination_metadata_t* metadata)
+set_lumps(wad_t* receiving, combination_metadata_t* metadata)
 {
 	int currentoffset = sizeof(wadheader_t);
+	lumpbundle_t* lumpbundles = malloc(sizeof(lumpbundle_t) * metadata->numlumps);
 
 	for (int i = 0; i < metadata->numlumps; ++i)
 	{
 		receiving->lumpbundles[i].lump.offset = currentoffset;
 		receiving->lumpbundles[i].buffer = metadata->lumpdata[i].buffer;
-		currentoffset += (int)metadata->lumpdata[i].lump.length;
-	}
-}
-
-static void
-set_lumps(wad_t* receiving, combination_metadata_t* metadata)
-{
-	lumpbundle_t* lumpbundles = malloc(sizeof(lumpbundle_t) * metadata->numlumps);
-
-	for (int i = 0; i < metadata->numlumps; ++i)
-	{
 		lumpbundles[i].lump = metadata->lumpdata[i].lump;
+		currentoffset += (int)metadata->lumpdata[i].lump.length;
 	}
 
 	receiving->lumpbundles = lumpbundles;

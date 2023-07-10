@@ -4,7 +4,7 @@
  * 
  * Provides basic reading and writing of WAD files
  *
- * Copyright (c) 2023 spacebub
+ * Copyright (c) 2023
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */

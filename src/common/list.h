@@ -4,7 +4,7 @@
  * 
  * Very simple mechanism for dynamic array management for use in this project
  *
- * Copyright (c) 2023 spacebub
+ * Copyright (c) 2023
  * Authors:
  *	spacebub <spacebubs@proton.me>
  */
@@ -26,9 +26,9 @@ typedef struct
 	int capacity;
 } list_t;
 
-// Returns a pointer to a basic dynamic list
-// of size "capacity", initialized with length 0
-// and a void** with dimension "capacity".
+// Returns a pointer to a basic initialized
+// with length 0 and a void** with dimension
+// "capacity".
 list_t*
 list_new(int capacity);
 // Takes a pointer to a given element of size_t size
